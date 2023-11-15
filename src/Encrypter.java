@@ -1,6 +1,8 @@
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Paths;
 import java.util.Scanner;
 
 public class Encrypter {
@@ -35,6 +37,49 @@ public class Encrypter {
     public void encrypt(String inputFilePath, String encryptedFilePath) throws Exception {
         //TODO: Call the read method, encrypt the file contents, and then write to new file
     }
+    	String message = readFile(inputFilePath);
+    	String newMessage = "";
+    	for (int i = 0; i < message.length(); i++) {
+    		if (Character.isLetter(message.charAt(i))) {
+        	int ascii = Integer.valueOf(message.charAt(i));
+			int codedAscii = ascii + this.shift;
+			int diff = 0;
+			String coded;
+    		if (Character.isUpperCase(message.charAt(i))) {
+    			if (codedAscii > 90) {
+    				diff = codedAscii - 90;
+    				codedAscii = 64 + diff;
+    	    		coded = Character.toString(codedAscii);
+    	    		newMessage = newMessage + coded;
+    			}
+    			else {
+    				codedAscii = ascii + this.shift;
+    	    		coded = Character.toString(codedAscii);
+    	    		newMessage = newMessage + coded;
+    			}
+    		}
+    		else {
+    			if (ascii > 122) {
+    				diff = codedAscii - 122;
+    				codedAscii = 96 + diff;
+    	    		coded = Character.toString(codedAscii);
+    	    		newMessage = newMessage + coded;
+    			}
+    			else {
+    				codedAscii = ascii + this.shift;
+    	    		coded = Character.toString(codedAscii);
+    	    		newMessage = newMessage + coded;
+    			}
+    		}
+    		}
+
+    		else {
+    			String filler = Character.toString(message.charAt(i));
+    			newMessage = newMessage + filler;
+    		}
+    	}
+    	writeFile(newMessage, encryptedFilePath);
+    	}
 
     /**
      * Decrypts the content of an encrypted file and writes the result to another file.
@@ -45,6 +90,48 @@ public class Encrypter {
      */
     public void decrypt(String messageFilePath, String decryptedFilePath) throws Exception {
         //TODO: Call the read method, decrypt the file contents, and then write to new file
+    	String message = readFile(messageFilePath);
+    	String newMessage = "";
+    	for (int i = 0; i < message.length(); i++) {
+    		if (Character.isLetter(message.charAt(i))) {
+        	int ascii = Integer.valueOf(message.charAt(i));
+			int codedAscii = ascii - this.shift;
+			int diff = 0;
+			String coded;
+    		if (Character.isUpperCase(message.charAt(i))) {
+    			if (codedAscii < 65) {
+    				diff = 65 - codedAscii;
+    				codedAscii = 91 - diff;
+    	    		coded = Character.toString(codedAscii);
+    	    		newMessage = newMessage + coded;
+    			}
+    			else {
+    				codedAscii = ascii - this.shift;
+    	    		coded = Character.toString(codedAscii);
+    	    		newMessage = newMessage + coded;
+    			}
+    		}
+    		else {
+    			if (codedAscii < 97) {
+    				diff = 97 - codedAscii;
+    				codedAscii = 123 - diff;
+    	    		coded = Character.toString(codedAscii);
+    	    		newMessage = newMessage + coded;
+    			}
+    			else {
+    				codedAscii = ascii - this.shift;
+    	    		coded = Character.toString(codedAscii);
+    	    		newMessage = newMessage + coded;
+    			}
+    		}
+    		}
+
+    		else {
+    			String filler = Character.toString(message.charAt(i));
+    			newMessage = newMessage + filler;
+    		}
+    	}
+    	writeFile(newMessage, decryptedFilePath);
     }
 
     /**
@@ -57,6 +144,16 @@ public class Encrypter {
     private static String readFile(String filePath) throws Exception {
         String message = "";
         //TODO: Read file from filePath
+    	try (Scanner fileScanner = new Scanner(Paths.get(filePath))) {
+    		while (fileScanner.hasNextLine()) {
+    			String line = fileScanner.nextLine();
+    			message += line;
+    		}
+    		fileScanner.close();
+    	}
+    	catch (Exception e) {
+    		System.out.println("Error: " + e.toString());
+    	}
         return message;
     }
 
@@ -68,6 +165,13 @@ public class Encrypter {
      */
     private static void writeFile(String data, String filePath) {
         //TODO: Write to filePath
+    	try (PrintWriter output = new PrintWriter(filePath)) {
+    		output.println(data);
+    		output.close();
+    	}
+    	catch (Exception e) {
+    		System.out.println("Error: " + e.toString());
+    	}
     }
 
     /**
@@ -77,6 +181,7 @@ public class Encrypter {
      */
     @Override
     public String toString() {
+
         return encrypted;
     }
 }
